@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows 12 Lite | Jamesy-tech</title>
+<link rel="icon" href="icon.png">
+<style>
+
+  :root{
+    /* ---- Palette: "Amethyst" ---- */
+    --bg-deep:      #0e0620;
+    --bg-mid:       #1c0f38;
+    --bg-glow-1:    #7c3aed;
+    --bg-glow-2:    #c084fc;
+    --bg-glow-3:    #4c1d95;
+
+    --glass:        rgba(38, 22, 62, 0.55);
+    --glass-strong: rgba(30, 17, 51, 0.72);
+    --glass-light:  rgba(255, 255, 255, 0.07);
+    --glass-border: rgba(220, 200, 255, 0.14);
+    --glass-border-strong: rgba(220, 200, 255, 0.22);
+
+    --accent:       #a879ff;
+    --accent-2:     #7c4dff;
+    --accent-soft:  rgba(168, 121, 255, 0.18);
+    --accent-line:  linear-gradient(135deg, #c9a2ff, #7c4dff);
+
+    --text-1:       #f6f2ff;
+    --text-2:       rgba(246, 242, 255, 0.68);
+    --text-3:       rgba(246, 242, 255, 0.42);
+
+    --radius-xl:    22px;
+    --radius-l:     16px;
+    --radius-m:     12px;
+    --radius-s:     8px;
+
+    --font-display: 'Segoe UI Variable Display', 'Segoe UI Variable', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-text:    'Segoe UI Variable Text', 'Segoe UI Variable', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-small:   'Segoe UI Variable Small', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+
+  *{ box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  html,body{ height:100%; margin:0; overflow:hidden; }
+  body{
+    font-family: var(--font-text);
+    color: var(--text-1);
+    user-select: none;
+    cursor: default;
+  }
+  ::selection{ background: var(--accent-soft); }
+
+  
+  #boot-fade{
+  position:fixed; inset:0; background:#000; z-index:999;
+  pointer-events:none;
+  animation: bootFadeOut 4s ease forwards;
+}
+@keyframes bootFadeOut{
+  from{ opacity:1; }
+  to{ opacity:0; }
+}
+
+  button{ font-family: inherit; color: inherit; }
+
+  /* =================== DESKTOP / WALLPAPER =================== */
+  #desktop{
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background:
+      radial-gradient(ellipse 900px 700px at 18% 12%, rgba(192,132,252,0.35), transparent 60%),
+      radial-gradient(ellipse 1000px 800px at 82% 88%, rgba(124,58,237,0.40), transparent 60%),
+      radial-gradient(ellipse 1200px 900px at 50% 50%, var(--bg-mid), var(--bg-deep) 75%);
+    overflow: hidden;
+  }
+
+  .blob{
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.55;
+    pointer-events: none;
+    animation: drift 26s ease-in-out infinite alternate;
+  }
+  .blob.b1{ width:620px; height:620px; background: var(--bg-glow-1); top:-160px; left:-120px; animation-duration: 24s; }
+  .blob.b2{ width:520px; height:520px; background: var(--bg-glow-2); bottom:-140px; right:-100px; animation-duration: 30s; }
+  .blob.b3{ width:420px; height:420px; background: var(--bg-glow-3); top:38%; left:55%; opacity:0.4; animation-duration: 34s; }
+  @keyframes drift{
+    from{ transform: translate(0,0) scale(1); }
+    to{ transform: translate(40px,-30px) scale(1.08); }
+  }
+
+  .grain{
+    position:absolute; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+    pointer-events:none;
+  }
+
+  /* =================== DESKTOP ICONS =================== */
+  #desktop-icons{
+    position:absolute; top:20px; left:16px;
+    display:flex; flex-direction:column; gap:4px;
+    z-index: 2;
+  }
+  .d-icon{
+    width:84px; padding:8px 4px 10px;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    border-radius: var(--radius-s);
+    text-align:center;
+  }
+  .d-icon:hover, .d-icon.selected{ background: rgba(255,255,255,0.08); outline:1px solid var(--glass-border); }
+  .d-icon .tile{
+    width:40px; height:40px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .d-icon span{
+    font-size:12px; color:var(--text-1);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    line-height:1.25;
+  }
+
+  /* =================== GENERIC ICON TILES =================== */
+  .tile{ flex-shrink:0; }
+  .tile svg{ width:100%; height:100%; display:block; }
+  .tile.recycle{ background: linear-gradient(160deg,#6d5a8f,#3b2a5c); }
+  .tile.pc{ background: linear-gradient(160deg,#8a6fd1,#4d3593); }
+  .tile.folder{ background: linear-gradient(160deg,#c9a2ff,#7c4dff); }
+  .tile.edge{ background: radial-gradient(circle at 30% 30%, #4fd6ff, #7c4dff 70%); }
+  .tile.settings{ background: linear-gradient(160deg,#8a8a9e,#4a4a5c); }
+
+  /* =================== WINDOW (Settings app open) =================== */
+  .window{
+    position:absolute;
+    background: var(--glass-strong);
+    backdrop-filter: blur(36px) saturate(160%);
+    -webkit-backdrop-filter: blur(36px) saturate(160%);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 30px 80px rgba(5,0,15,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+    overflow:hidden;
+    display:flex; flex-direction:column;
+    z-index: 5;
+  }
+  .win-titlebar{
+    height:44px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 10px 0 16px;
+    -webkit-app-region: drag;
+  }
+  .win-title{ display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-2); }
+  .win-title .tile{ width:18px; height:18px; border-radius:5px; }
+  .win-controls{ display:flex; align-items:center; }
+  .win-controls button{
+    width:42px; height:32px; border:none; background:transparent;
+    display:flex; align-items:center; justify-content:center; border-radius:6px; cursor:pointer;
+  }
+  .win-controls button:hover{ background: rgba(255,255,255,0.09); }
+  .win-controls button.close:hover{ background:#e81123; }
+  .win-controls svg{ width:11px; height:11px; }
+
+  /* ---- window open/close animation ---- */
+  @keyframes winOpen{
+    from{ opacity:0; transform: scale(.93) translateY(16px); }
+    to{ opacity:1; transform: scale(1) translateY(0); }
+  }
+  @keyframes winClose{
+    from{ opacity:1; transform: scale(1) translateY(0); }
+    to{ opacity:0; transform: scale(.94) translateY(10px); }
+  }
+  .window.opening{ animation: winOpen .24s cubic-bezier(.16,1,.3,1) both; }
+  .window.closing{ animation: winClose .16s ease both; }
+  .window.minimizing{ animation: winMinimize .2s cubic-bezier(.4,0,1,1) both; }
+  @keyframes winMinimize{
+    from{ opacity:1; transform: scale(1) translateY(0); }
+    to{ opacity:0; transform: scale(.5) translateY(240px); }
+  }
+  .window.resizing{ transition: top .22s cubic-bezier(.2,.8,.3,1), left .22s cubic-bezier(.2,.8,.3,1), width .22s cubic-bezier(.2,.8,.3,1), height .22s cubic-bezier(.2,.8,.3,1), border-radius .22s ease; }
+
+  /* ---- maximize / fullscreen state ---- */
+  .window.maximized{
+    top: 10px !important;
+    left: 10px !important;
+    width: calc(100vw - 20px) !important;
+    height: calc(100vh - 96px) !important;
+    border-radius: var(--radius-l) !important;
+  }
+
+  /* ---- taskbar launch bounce ---- */
+  @keyframes iconBounce{
+    0%{ transform: scale(1) translateY(0); }
+    28%{ transform: scale(.82) translateY(4px); }
+    58%{ transform: scale(1.16) translateY(-9px); }
+    82%{ transform: scale(.96) translateY(2px); }
+    100%{ transform: scale(1) translateY(0); }
+  }
+  .tb-btn.bounce{ animation: iconBounce .5s cubic-bezier(.28,.84,.42,1); }
+
+  /* ---- toast ---- */
+  #toast{
+    position:absolute; left:50%; bottom:78px; transform: translate(-50%, 10px);
+    background: var(--glass-strong);
+    backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border:1px solid var(--glass-border-strong); border-radius: 14px;
+    padding: 11px 18px; font-size:12.5px; color:var(--text-1);
+    display:flex; align-items:center; gap:10px;
+    opacity:0; pointer-events:none; transition: opacity .18s ease, transform .18s ease;
+    z-index: 60; box-shadow: 0 20px 50px rgba(5,0,20,0.5);
+    white-space:nowrap;
+  }
+  #toast.show{ opacity:1; transform: translate(-50%, 0); }
+  #toast .spin{
+    width:14px; height:14px; border-radius:50%;
+    border: 2px solid rgba(255,255,255,0.25); border-top-color: var(--accent);
+    animation: spin .7s linear infinite; flex-shrink:0;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .settings-body{ display:flex; flex:1; min-height:0; }
+  .settings-nav{
+    width:230px; flex-shrink:0; padding:8px 10px; overflow-y:auto;
+    border-right:1px solid var(--glass-border);
+  }
+  .settings-search{
+    display:flex; align-items:center; gap:8px;
+    background: rgba(255,255,255,0.06); border:1px solid var(--glass-border);
+    border-radius: 8px; padding:8px 10px; margin: 4px 4px 12px;
+    color:var(--text-3); font-size:13px;
+  }
+
+  .settings-search svg{ width:14px; height:14px; opacity:0.7; flex-shrink:0; }
+  .acct-row{ display:flex; align-items:center; gap:10px; padding:8px 8px 16px; margin-bottom:6px; border-bottom:1px solid var(--glass-border); }
+  .acct-avatar{
+    width:38px; height:38px; border-radius:50%;
+    background: var(--accent-line);
+    display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;
+  }
+  .acct-name{ font-size:13px; }
+  .acct-sub{ font-size:11.5px; color:var(--text-3); }
+
+  .nav-item{
+    display:flex; align-items:center; gap:12px;
+    padding:9px 10px; border-radius:8px; font-size:13px; color:var(--text-2);
+    cursor:pointer; margin-bottom:2px;
+  }
+  .nav-item svg{ width:17px; height:17px; opacity:0.85; }
+  .nav-item:hover{ background: rgba(255,255,255,0.06); }
+  .nav-item.active{ background: var(--accent-soft); color:var(--text-1); }
+  .nav-item.active svg{ color: var(--accent); }
+
+  .settings-main{ flex:1; overflow-y:auto; padding: 22px 34px 34px; }
+  .settings-main h1{ font-family: var(--font-display); font-size:22px; font-weight:600; margin:0 0 4px; }
+  .settings-main .crumb{ font-size:12px; color:var(--text-3); margin-bottom:22px; }
+
+  .theme-card{
+    background: rgba(255,255,255,0.045);
+    border:1px solid var(--glass-border);
+    border-radius: var(--radius-l);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .theme-card h3{ margin:0 0 3px; font-size:14px; font-weight:600; }
+  .theme-card p{ margin:0 0 16px; font-size:12.5px; color:var(--text-3); }
+
+  .swatches{ display:flex; gap:12px; flex-wrap:wrap; }
+  .swatch{
+    width:44px; height:44px; border-radius:50%;
+    cursor:pointer; position:relative;
+    border: 2px solid transparent;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .swatch.active{ border-color: var(--text-1); }
+  .swatch.active::after{
+    content:''; width:16px; height:16px; border-radius:50%;
+    background: rgba(0,0,0,0.35);
+  }
+  .swatch.active svg{ position:absolute; width:16px; height:16px; color:#fff; }
+
+  .mode-toggle{ display:flex; gap:10px; }
+  .mode-btn{
+    flex:1; border-radius:10px; border:1px solid var(--glass-border);
+    padding:12px; cursor:pointer; text-align:center; font-size:12.5px; color:var(--text-2);
+    background: rgba(255,255,255,0.03);
+  }
+  .mode-btn .prev{ height:44px; border-radius:6px; margin-bottom:8px; }
+  .mode-btn.dark{ border-color: var(--accent); background: var(--accent-soft); color:var(--text-1); }
+  .mode-btn.dark .prev{ background: linear-gradient(135deg,#1c0f38,#0e0620); }
+  .mode-btn.light .prev{ background: linear-gradient(135deg,#efe6ff,#cbb6ff); }
+
+  .toggle-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 13px 4px; border-bottom: 1px solid var(--glass-border);
+    font-size:13px;
+  }
+  .toggle-row:last-child{ border-bottom:none; }
+  .toggle-row .sub{ font-size:11.5px; color:var(--text-3); margin-top:2px; }
+  .switch{
+    width:38px; height:22px; border-radius:12px; background: rgba(255,255,255,0.14);
+    position:relative; cursor:pointer; flex-shrink:0;
+  }
+  .switch.on{ background: var(--accent-line); }
+  .switch::after{
+    content:''; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%;
+    background:#fff; transition: left .15s ease;
+  }
+  .switch.on::after{ left:19px; }
+
+  /* =================== FILE EXPLORER =================== */
+  .fe-toolbar{
+    display:flex; align-items:center; gap:8px;
+    padding: 8px 14px; border-bottom: 1px solid var(--glass-border); flex-shrink:0;
+  }
+  .fe-nav-btn{
+    width:30px; height:30px; border-radius:8px; border:none; background: rgba(255,255,255,0.05);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-2);
+  }
+  .fe-nav-btn:hover{ background: rgba(255,255,255,0.1); }
+  .fe-nav-btn svg{ width:14px; height:14px; }
+  .fe-crumbs{
+    flex:1; display:flex; align-items:center; gap:6px;
+    background: rgba(255,255,255,0.05); border:1px solid var(--glass-border);
+    border-radius:8px; height:30px; padding:0 12px; font-size:12.5px; color:var(--text-2);
+  }
+  .fe-crumbs b{ color:var(--text-1); font-weight:600; }
+  .fe-search-box{
+    display:flex; align-items:center; gap:6px;
+    background: rgba(255,255,255,0.05); border:1px solid var(--glass-border);
+    border-radius:8px; height:30px; padding:0 10px; width:160px; color:var(--text-3); font-size:12px;
+  }
+  .fe-search-box svg{ width:13px; height:13px; opacity:0.7; flex-shrink:0; }
+  .fe-search-box input{
+    background:none; border:none; outline:none; color:var(--text-1); font-size:12px; width:100%; font-family:inherit;
+  }
+  .fe-search-box input::placeholder{ color:var(--text-3); }
+
+  .fe-body{ display:flex; flex:1; min-height:0; }
+  .fe-sidebar{ width:190px; flex-shrink:0; padding:10px 8px; overflow-y:auto; border-right:1px solid var(--glass-border); }
+  .fe-sec-label{ font-size:11px; color:var(--text-3); font-weight:600; text-transform:uppercase; letter-spacing:.04em; padding:10px 10px 6px; }
+  .fe-nav-item{
+    display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:7px;
+    font-size:12.5px; color:var(--text-2); cursor:pointer; margin-bottom:1px;
+  }
+  .fe-nav-item svg{ width:15px; height:15px; opacity:0.85; flex-shrink:0; }
+  .fe-nav-item:hover{ background: rgba(255,255,255,0.06); }
+  .fe-nav-item.active{ background: var(--accent-soft); color:var(--text-1); }
+  .fe-nav-item.active svg{ color: var(--accent); }
+
+  .fe-main{ flex:1; overflow-y:auto; padding:16px 20px; }
+  .fe-main h4{ margin:0 0 12px; font-size:12px; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:.04em; }
+  .fe-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(96px,1fr)); gap:4px 6px; }
+  .fe-item{
+    display:flex; flex-direction:column; align-items:center; gap:7px;
+    padding:12px 6px; border-radius:9px; cursor:pointer; text-align:center;
+    border: 1px solid transparent;
+  }
+  .fe-item:hover{ background: rgba(255,255,255,0.055); }
+  .fe-item.selected{ background: var(--accent-soft); border-color: var(--glass-border-strong); }
+  .fe-item .tile{ width:38px; height:38px; border-radius:9px; }
+  .fe-item span{ font-size:11.5px; color:var(--text-1); line-height:1.25; word-break:break-word; }
+  .fe-item .fe-sub{ font-size:9.5px; color:var(--text-3); }
+  .fe-empty{ text-align:center; padding:50px 10px; color:var(--text-3); font-size:12.5px; }
+
+  /* =================== TASKBAR (floating) =================== */
+  #taskbar-wrap{
+    position:absolute; left:0; right:0; bottom:12px;
+    display:flex; justify-content:center;
+    z-index: 20;
+    pointer-events:none;
+  }
+  #taskbar{
+    pointer-events:all;
+    display:flex; align-items:center; gap:4px;
+    padding: 6px 10px;
+    background: var(--glass);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: 0 18px 50px rgba(5,0,20,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
+  }
+  .tb-group{ display:flex; align-items:center; gap:4px; }
+  .tb-sep{ width:1px; height:26px; background: var(--glass-border); margin:0 6px; }
+
+  .tb-btn{
+    width:46px; height:46px; border-radius:12px; border:none; background:transparent;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    position:relative;
+    transition: transform .14s cubic-bezier(.2,.9,.3,1.3), background .12s ease;
+  }
+  .tb-btn svg{ width:22px; height:22px; }
+  .tb-btn:hover{ background: rgba(255,255,255,0.10); }
+  .tb-btn.active-app::after{
+    content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%);
+    width:5px; height:5px; border-radius:50%; background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+  }
+  .tb-btn.start-btn{ width:48px; height:48px; }
+  .tb-btn.start-btn svg{ width:20px; height:20px; }
+
+  .tb-search{
+    display:flex; align-items:center; gap:8px;
+    height:40px; padding:0 14px; border-radius:14px;
+    background: rgba(255,255,255,0.07);
+    border:1px solid var(--glass-border);
+    color: var(--text-3); font-size:13px; cursor:text; min-width:170px;
+  }
+  .tb-search svg{ width:15px; height:15px; opacity:0.75; flex-shrink:0; }
+
+  .tb-tray{
+    display:flex; align-items:center; gap:2px;
+    height:40px; padding: 0 10px; border-radius:12px; cursor:pointer;
+  }
+  .tb-tray:hover{ background: rgba(255,255,255,0.10); }
+  .tb-tray svg{ width:16px; height:16px; }
+
+  .tb-clock{
+    display:flex; flex-direction:column; align-items:flex-end; justify-content:center;
+    padding: 4px 12px; border-radius:10px; cursor:pointer; line-height:1.25;
+  }
+  .tb-clock:hover{ background: rgba(255,255,255,0.10); }
+  .tb-clock .time{ font-size:12.5px; font-weight:600; }
+  .tb-clock .date{ font-size:11px; color: var(--text-3); }
+
+  .tb-desktop-edge{
+    width:8px; height:38px; border-radius:6px; margin-left:2px;
+    border-left:1px solid var(--glass-border); cursor:pointer;
+  }
+  .tb-desktop-edge:hover{ background: rgba(255,255,255,0.10); }
+
+  /* =================== START MENU =================== */
+  #start-menu{
+    position:absolute; left:50%; bottom:78px;
+    transform: translate(-50%, 12px) scale(0.97);
+    width: 620px; max-height: 620px;
+    background: var(--glass-strong);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid var(--glass-border-strong);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 30px 90px rgba(5,0,20,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+    padding: 22px 26px 16px;
+    opacity:0; pointer-events:none;
+    transition: opacity .16s ease, transform .16s ease;
+    z-index: 30;
+  }
+  #start-menu.open{ opacity:1; transform: translate(-50%, 0) scale(1); pointer-events:all; }
+
+  .sm-search{
+    display:flex; align-items:center; gap:10px;
+    height:42px; padding:0 14px; border-radius:11px;
+    background: rgba(255,255,255,0.07); border:1px solid var(--glass-border);
+    color: var(--text-3); font-size:13.5px; margin-bottom: 22px;
+  }
+  .sm-search svg{ width:15px; height:15px; opacity:0.7; }
+
+  .sm-row-label{
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:13px; font-weight:600; color:var(--text-2); margin-bottom:12px;
+  }
+  .sm-row-label a{ font-size:11.5px; font-weight:500; color:var(--text-3); text-decoration:none; }
+
+  .sm-pinned-grid{
+    display:grid; grid-template-columns: repeat(6, 1fr); gap:6px 4px;
+    margin-bottom: 22px;
+  }
+  .sm-app{
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    padding:10px 4px; border-radius:10px; cursor:pointer; text-align:center;
+  }
+  .sm-app:hover{ background: rgba(255,255,255,0.06); }
+  .sm-app .tile{ width:34px; height:34px; border-radius:9px; }
+  .sm-app span{ font-size:11px; color:var(--text-2); }
+
+  .sm-recommended{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:18px; }
+  .sm-rec-card{
+    display:flex; align-items:center; gap:10px;
+    background: rgba(255,255,255,0.045); border:1px solid var(--glass-border);
+    border-radius:10px; padding:10px; cursor:pointer;
+  }
+  .sm-rec-card:hover{ background: rgba(255,255,255,0.08); }
+  .sm-rec-card .tile{ width:30px; height:30px; border-radius:7px; flex-shrink:0; }
+  .sm-rec-card .rc-name{ font-size:11.5px; color:var(--text-1); line-height:1.3; }
+  .sm-rec-card .rc-sub{ font-size:10px; color:var(--text-3); }
+
+  .sm-footer{
+    display:flex; align-items:center; justify-content:space-between;
+    border-top: 1px solid var(--glass-border); padding-top:14px; margin-top:4px;
+  }
+  .sm-user{ display:flex; align-items:center; gap:10px; padding:6px; border-radius:8px; cursor:pointer; }
+  .sm-user:hover{ background: rgba(255,255,255,0.06); }
+  .sm-user .acct-avatar{ width:30px; height:30px; font-size:12px; }
+  .sm-user span{ font-size:12.5px; }
+  .sm-power{ width:36px; height:36px; border-radius:8px; border:none; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .sm-power:hover{ background: rgba(255,255,255,0.08); }
+  .sm-power svg{ width:17px; height:17px; }
+
+  /* =================== FLYOUTS (quick settings / calendar / widgets) =================== */
+  .flyout{
+    position:absolute; bottom:78px;
+    background: var(--glass-strong);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid var(--glass-border-strong);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 30px 90px rgba(5,0,20,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+    opacity:0; pointer-events:none; transform: translateY(10px);
+    transition: opacity .15s ease, transform .15s ease;
+    z-index: 30;
+  }
+  .flyout.open{ opacity:1; pointer-events:all; transform: translateY(0); }
+
+  #quick-settings{ right: 12px; width: 320px; padding: 18px; }
+  .qs-tiles{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-bottom:16px; }
+  .qs-tile{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:12px 4px; border-radius:12px; cursor:pointer;
+    background: rgba(255,255,255,0.05); border:1px solid var(--glass-border);
+    font-size:10.5px; color:var(--text-2);
+  }
+  .qs-tile.on{ background: var(--accent-soft); border-color: var(--accent); color:var(--text-1); }
+  .qs-tile.on svg{ color: var(--accent); }
+  .qs-tile svg{ width:18px; height:18px; }
+
+  .qs-slider-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .qs-slider-row svg{ width:16px; height:16px; opacity:0.75; flex-shrink:0; }
+  .qs-slider{ flex:1; -webkit-appearance:none; height:4px; border-radius:2px; background: rgba(255,255,255,0.15); outline:none; }
+  .qs-slider::-webkit-slider-thumb{ -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background: var(--text-1); cursor:pointer; box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  .qs-bottom{ display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--glass-border); padding-top:12px; font-size:11.5px; color:var(--text-3); }
+  .qs-battery{ display:flex; align-items:center; gap:6px; }
+  .qs-battery svg{ width:18px; height:18px; }
+
+  #calendar-flyout{ right: 12px; width: 300px; padding: 18px; }
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .cal-head .cal-title{ font-size:13.5px; font-weight:600; }
+  .cal-nav{ display:flex; gap:4px; }
+  .cal-nav button{ width:24px; height:24px; border:none; background:transparent; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .cal-nav button:hover{ background: rgba(255,255,255,0.08); }
+  .cal-nav svg{ width:12px; height:12px; }
+  .cal-grid{ display:grid; grid-template-columns: repeat(7,1fr); gap:4px; text-align:center; font-size:11px; }
+  .cal-grid .dow{ color:var(--text-3); padding-bottom:6px; font-weight:600; }
+  .cal-grid .day{ padding:6px 0; border-radius:8px; color:var(--text-2); cursor:pointer; }
+  .cal-grid .day:hover{ background: rgba(255,255,255,0.08); }
+  .cal-grid .day.today{ background: var(--accent-line); color:#fff; font-weight:600; }
+  .cal-grid .day.muted{ color:var(--text-3); opacity:0.4; }
+
+  #widgets-flyout{ left: 12px; width: 320px; padding: 20px; }
+  .wg-weather{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .wg-temp{ font-family: var(--font-display); font-size:34px; font-weight:300; }
+  .wg-loc{ font-size:12px; color:var(--text-3); }
+  .wg-cond{ font-size:12px; color:var(--text-2); margin-top:2px; }
+  .wg-icon{ width:48px; height:48px; }
+  .wg-card{ background: rgba(255,255,255,0.045); border:1px solid var(--glass-border); border-radius:12px; padding:12px; margin-bottom:8px; cursor:pointer; }
+  .wg-card:hover{ background: rgba(255,255,255,0.08); }
+  .wg-card .wg-cat{ font-size:10px; color: var(--accent); text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:4px; }
+  .wg-card .wg-headline{ font-size:12.5px; line-height:1.35; }
+
+  #search-flyout{ left:50%; transform: translate(-50%,10px); width: 560px; max-height: 640px; padding: 16px 18px 14px; display:flex; flex-direction:column; }
+  #search-flyout.open{ transform: translate(-50%,0); }
+  .srch-input-row{
+    display:flex; align-items:center; gap:10px;
+    height:44px; padding:0 14px; border-radius:11px;
+    background: rgba(255,255,255,0.07); border:1px solid var(--glass-border-strong);
+    margin-bottom: 16px; flex-shrink:0;
+  }
+  .srch-input-row svg{ width:16px; height:16px; opacity:0.7; flex-shrink:0; color:var(--text-2); }
+  .srch-input-row input{
+    flex:1; background:none; border:none; outline:none; color:var(--text-1);
+    font-size:14.5px; font-family:inherit;
+  }
+  .srch-input-row input::placeholder{ color:var(--text-3); }
+  .srch-clear{ width:20px; height:20px; border-radius:50%; border:none; background:rgba(255,255,255,0.08); display:none; align-items:center; justify-content:center; cursor:pointer; color:var(--text-2); flex-shrink:0; }
+  .srch-clear svg{ width:10px; height:10px; }
+  .srch-input-row.has-text .srch-clear{ display:flex; }
+
+  #search-results{ overflow-y:auto; flex:1; min-height: 120px; }
+  .srch-section-label{ font-size:11px; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:.04em; padding:6px 6px 8px; }
+  .srch-row{
+    display:flex; align-items:center; gap:12px; padding:8px 10px; border-radius:9px; cursor:pointer;
+  }
+  .srch-row:hover, .srch-row.hi{ background: rgba(255,255,255,0.07); }
+  .srch-row .tile{ width:32px; height:32px; border-radius:8px; flex-shrink:0; }
+  .srch-row .srch-name{ font-size:13px; color:var(--text-1); }
+  .srch-row .srch-sub{ font-size:11px; color:var(--text-3); margin-top:1px; }
+  .srch-empty{ text-align:center; padding:40px 10px; color:var(--text-3); font-size:12.5px; }
+  .srch-hint{ font-size:11px; color:var(--text-3); padding:4px 6px 0; }
+
+  /* =================== CONTEXT MENU =================== */
+  #ctx-menu{
+    position:absolute;
+    background: var(--glass-strong);
+    backdrop-filter: blur(36px) saturate(180%);
+    -webkit-backdrop-filter: blur(36px) saturate(180%);
+    border: 1px solid var(--glass-border-strong);
+    border-radius: var(--radius-m);
+    box-shadow: 0 20px 60px rgba(5,0,20,0.55);
+    padding: 6px; width: 240px;
+    opacity:0; pointer-events:none; transform: scale(0.96);
+    transform-origin: top left;
+    transition: opacity .1s ease, transform .1s ease;
+    z-index: 50;
+  }
+  #ctx-menu.open{ opacity:1; pointer-events:all; transform: scale(1); }
+  .ctx-item{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:6px; font-size:12.5px; cursor:pointer; color:var(--text-2); }
+  .ctx-item:hover{ background: rgba(255,255,255,0.08); color:var(--text-1); }
+  .ctx-item svg{ width:15px; height:15px; opacity:0.8; }
+  .ctx-sep{ height:1px; background: var(--glass-border); margin:5px 8px; }
+
+  /* scrollbars */
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.14); border-radius:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+
+  .credit{
+    position:absolute; top:16px; right:20px; z-index:2;
+    font-size:11px; color: var(--text-3); text-align:right; line-height:1.5;
+  }
+
+  @media (max-width: 760px){
+    #start-menu{ width: 92vw; }
+    #search-flyout{ width: 92vw; }
+    .sm-pinned-grid{ grid-template-columns: repeat(4,1fr); }
+    .sm-recommended{ grid-template-columns: repeat(1,1fr); }
+    #desktop-icons{ display:none; }
+    .window{ display:none; }
+    .tb-search{ min-width:0; width:44px; padding:0; justify-content:center; }
+    .tb-search span{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+    <div id="boot-fade"></div>
+
+<div id="desktop">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="grain"></div>
+
+  <div class="credit">Windows 12 Lite concept<br>unofficial fan design · not a real Microsoft product</div>
+
+  <!-- Desktop icons -->
+  <div id="desktop-icons">
+    <div class="d-icon" data-open="explorer" data-fe-section="localdisk">
+      <div class="tile pc">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="1.5" stroke="white" stroke-width="1.6"/><path d="M9 20h6M12 16v4" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <span>This PC</span>
+    </div>
+    <div class="d-icon" data-open="explorer" data-fe-section="recyclebin">
+      <div class="tile recycle">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M6 7h12" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+          <rect x="9" y="4" width="6" height="3" rx="1" stroke="white" stroke-width="1.6"/>
+          <path d="M7 7L8 20a1 1 0 001 1h6a1 1 0 001-1l1-13" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M10 10.5v7M14 10.5v7" stroke="white" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
+        </svg>
+      </div>
+      <span>Recycle Bin</span>
+    </div>
+    <div class="d-icon" data-open="toast" data-toast-label="Microsoft Edge">
+      <div class="tile edge">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1014-5.5" stroke="white" stroke-width="1.7" stroke-linecap="round"/><path d="M4 12a8 8 0 008 8" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+      <span>Edge</span>
+    </div>
+    <div class="d-icon" data-open="explorer" data-fe-section="documents">
+      <div class="tile folder">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 7a1 1 0 011-1h4l2 2h8a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V7z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </div>
+      <span>Documents</span>
+    </div>
+    <div class="d-icon selected" data-open="settings">
+      <div class="tile settings">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="white" stroke-width="1.6"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M6.3 17.7l1.4-1.4M16.3 7.7l1.4-1.4" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <span>Settings</span>
+    </div>
+  </div>
+
+  <!-- Open window: Settings > Personalization > Colors -->
+  <div class="window" id="settings-window" style="display:none;top:64px; left:170px; width:860px; height:580px;">
+    <div class="win-titlebar">
+      <div class="win-title">
+        <div class="tile settings"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="white" stroke-width="1.6"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M6.3 17.7l1.4-1.4M16.3 7.7l1.4-1.4" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        Settings
+      </div>
+      <div class="win-controls">
+        <button title="Minimize" data-win-action="minimize"><svg viewBox="0 0 11 11"><rect y="5" width="11" height="1.1" fill="currentColor"/></svg></button>
+        <button title="Maximize" data-win-action="maximize"><svg viewBox="0 0 11 11"><rect x="0.5" y="0.5" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1"/></svg></button>
+        <button class="close" title="Close" data-win-action="close"><svg viewBox="0 0 11 11"><line x1="0" y1="0" x2="11" y2="11" stroke="currentColor" stroke-width="1.1"/><line x1="11" y1="0" x2="0" y2="11" stroke="currentColor" stroke-width="1.1"/></svg></button>
+      </div>
+    </div>
+    <div class="settings-body">
+      <div class="settings-nav">
+        <div class="settings-search">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Find a setting
+        </div>
+        <div class="acct-row">
+          <div class="acct-avatar">JT</div>
+          <div>
+            <div class="acct-name">Jamesy-tech</div>
+            <div class="acct-sub">jamesy-tech.github.io</div>
+          </div>
+        </div>
+        <div class="nav-item"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>System</div>
+        <div class="nav-item"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8l8-4 8 4-8 4-8-4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M4 8v8l8 4 8-4V8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Bluetooth &amp; devices</div>
+        <div class="nav-item"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke="currentColor" stroke-width="1.5"/><path d="M3 12h18M12 3a13 13 0 010 18M12 3a13 13 0 000 18" stroke="currentColor" stroke-width="1.3"/></svg>Network &amp; internet</div>
+        <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4S17.8 16.4 19 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Personalization</div>
+        <div class="nav-item"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M9 20h6M12 16v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Apps</div>
+        <div class="nav-item"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Time &amp; language</div>
+        <div class="nav-item"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Windows Update</div>
+      </div>
+
+      <div class="settings-main">
+        <div class="crumb">Personalization</div>
+        <h1>Colors</h1>
+        <div class="crumb" style="margin-bottom:20px;">Choose an accent color and where it appears across Windows.</div>
+
+        <div class="theme-card">
+          <h3>Choose your mode</h3>
+          <p>Pick how Windows and apps look across your device.</p>
+          <div class="mode-toggle">
+            <div class="mode-btn dark"><div class="prev"></div>Dark</div>
+            <div class="mode-btn light"><div class="prev"></div>Light</div>
+          </div>
+        </div>
+
+        <div class="theme-card">
+          <h3>Accent color</h3>
+          <p>Amethyst is applied to the Start menu, taskbar, and window highlights.</p>
+          <div class="swatches">
+            <div class="swatch active" style="background:#7c4dff;"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="swatch" style="background:#c084fc;"></div>
+            <div class="swatch" style="background:#4c1d95;"></div>
+            <div class="swatch" style="background:#ff6ad5;"></div>
+            <div class="swatch" style="background:#00c2ff;"></div>
+            <div class="swatch" style="background:#22c55e;"></div>
+            <div class="swatch" style="background:#f59e0b;"></div>
+          </div>
+        </div>
+
+        <div class="theme-card" style="padding-top:6px; padding-bottom:6px;">
+          <div class="toggle-row">
+            <div><div>Show accent color on Start and taskbar</div></div>
+            <div class="switch on"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div>Show accent color on title bars and windows borders</div></div>
+            <div class="switch on"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div>Transparency effects</div><div class="sub">Mica and acrylic blur across the shell</div></div>
+            <div class="switch on"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div>Floating taskbar</div><div class="sub">Detach the taskbar from the screen edge</div></div>
+            <div class="switch on"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Open window: File Explorer -->
+  <div class="window" id="explorer-window" style="top:96px; left:260px; width:840px; height:540px; display:none;">
+    <div class="win-titlebar">
+      <div class="win-title">
+        <div class="tile folder"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7a1 1 0 011-1h4l2 2h8a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V7z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+        <span id="fe-title-label">Documents</span>
+      </div>
+      <div class="win-controls">
+        <button title="Minimize" data-win-action="minimize"><svg viewBox="0 0 11 11"><rect y="5" width="11" height="1.1" fill="currentColor"/></svg></button>
+        <button title="Maximize" data-win-action="maximize"><svg viewBox="0 0 11 11"><rect x="0.5" y="0.5" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1"/></svg></button>
+        <button class="close" title="Close" data-win-action="close"><svg viewBox="0 0 11 11"><line x1="0" y1="0" x2="11" y2="11" stroke="currentColor" stroke-width="1.1"/><line x1="11" y1="0" x2="0" y2="11" stroke="currentColor" stroke-width="1.1"/></svg></button>
+      </div>
+    </div>
+
+    <div class="fe-toolbar">
+      <button class="fe-nav-btn" title="Back"><svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="fe-nav-btn" title="Forward"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="fe-nav-btn" title="Up"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V6M6 11l6-6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="fe-crumbs">This PC &nbsp;›&nbsp; <b id="fe-crumb-label">Documents</b></div>
+      <div class="fe-search-box">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input type="text" id="fe-search-input" placeholder="Search">
+      </div>
+    </div>
+
+    <div class="fe-body">
+      <div class="fe-sidebar" id="fe-sidebar">
+        <div class="fe-sec-label">Quick access</div>
+        <div class="fe-nav-item" data-fe="desktop"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M9 20h6M12 16v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Desktop</div>
+        <div class="fe-nav-item active" data-fe="documents"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7a1 1 0 011-1h4l2 2h8a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Documents</div>
+        <div class="fe-nav-item" data-fe="downloads"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Downloads</div>
+        <div class="fe-nav-item" data-fe="pictures"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="9.5" r="1.7" stroke="currentColor" stroke-width="1.3"/><path d="M4 17l5-5 4 4 3-3 4 4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Pictures</div>
+        <div class="fe-nav-item" data-fe="music"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18V5l11-2v13" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6" cy="18" r="2.4" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="16" r="2.4" stroke="currentColor" stroke-width="1.6"/></svg>Music</div>
+        <div class="fe-sec-label">This PC</div>
+        <div class="fe-nav-item" data-fe="localdisk"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M9 20h6M12 16v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Local Disk (C:)</div>
+        <div class="fe-nav-item" data-fe="recyclebin"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="9" y="4" width="6" height="3" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M7 7L8 20a1 1 0 001 1h6a1 1 0 001-1l1-13" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Recycle Bin</div>
+      </div>
+
+      <div class="fe-main">
+        <h4 id="fe-section-heading">Documents</h4>
+        <div class="fe-grid" id="fe-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Menu -->
+  <div id="start-menu">
+    <div class="sm-search">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Search for apps, settings, and files
+    </div>
+
+    <div class="sm-row-label"><span>Pinned</span><a href="#">All apps &gt;</a></div>
+    <div class="sm-pinned-grid" id="sm-pinned"></div>
+
+    <div class="sm-row-label"><span>Recommended</span><a href="#">More &gt;</a></div>
+    <div class="sm-recommended" id="sm-recommended"></div>
+
+    <div class="sm-footer">
+      <div class="sm-user">
+        <div class="acct-avatar">JT</div>
+        <span>Jamesy-tech</span>
+      </div>
+      <button class="sm-power" title="Power" onclick="window.location.href = 'startup.html';">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7 6a8 8 0 1010 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick settings flyout -->
+  <div class="flyout" id="quick-settings">
+    <div class="qs-tiles">
+      <div class="qs-tile on" data-qs><svg viewBox="0 0 24 24" fill="none"><path d="M3 8.5a15 15 0 0118 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M6.5 12a10 10 0 0111 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M10 15.5a5 5 0 014 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="18.5" r="1.1" fill="currentColor"/></svg>Wi-Fi</div>
+      <div class="qs-tile on" data-qs><svg viewBox="0 0 24 24" fill="none"><path d="M7 7h10l-5 5 5 5H7l5-5-5-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Bluetooth</div>
+      <div class="qs-tile" data-qs><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 5-8 13-8-13 8-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Airplane</div>
+      <div class="qs-tile on" data-qs><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Night light</div>
+      <div class="qs-tile" data-qs><svg viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 10-11.3 3L5 15h14l-1.7-4a6 6 0 001-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.5 18a2.5 2.5 0 005 0" stroke="currentColor" stroke-width="1.5"/></svg>Focus</div>
+      <div class="qs-tile" data-qs><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="6" width="16" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 20h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Project</div>
+    </div>
+
+    <div class="qs-slider-row">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input type="range" class="qs-slider" value="70">
+    </div>
+    <div class="qs-slider-row">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 10v4h4l5 4V6l-5 4H4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M17 9a4 4 0 010 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input type="range" class="qs-slider" value="45">
+    </div>
+
+    <div class="qs-bottom">
+      <div class="qs-battery">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="8" width="17" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="20" y="10.5" width="2" height="3" rx="0.5" fill="currentColor"/><rect x="4" y="10" width="10" height="4" fill="currentColor"/></svg>
+        82% — Charging
+      </div>
+      <svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;cursor:pointer;"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M12 5v2M12 17v2M5 12h2M17 12h2M6.8 6.8l1.4 1.4M15.8 15.8l1.4 1.4M6.8 17.2l1.4-1.4M15.8 8.2l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+
+  <!-- Calendar flyout -->
+  <div class="flyout" id="calendar-flyout">
+    <div class="cal-head">
+      <div class="cal-title" id="cal-month-label">August 2026</div>
+      <div class="cal-nav">
+        <button><svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+  <!-- Widgets flyout -->
+  <div class="flyout" id="widgets-flyout">
+    <div class="wg-weather">
+      <div>
+        <div class="wg-temp">17°</div>
+        <div class="wg-loc">Auckland, NZ</div>
+        <div class="wg-cond">Partly cloudy</div>
+      </div>
+      <svg class="wg-icon" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="10" r="4.2" fill="#c9a2ff"/><path d="M8 17a4.2 4.2 0 01.4-8.4A5.4 5.4 0 0119 11a3.6 3.6 0 01-.6 7.1H9.2A3.6 3.6 0 018 17z" fill="#efe6ff"/></svg>
+    </div>
+    <div class="wg-card">
+      <div class="wg-cat">Technology</div>
+      <div class="wg-headline">Concept renders imagine a floating, glass-styled taskbar for next-gen Windows</div>
+    </div>
+    <div class="wg-card">
+      <div class="wg-cat">Markets</div>
+      <div class="wg-headline">Tech shares tick higher as investors weigh chip demand outlook</div>
+    </div>
+    <div class="wg-card">
+      <div class="wg-cat">Design</div>
+      <div class="wg-headline">Mica and acrylic materials return with deeper purple tinting</div>
+    </div>
+  </div>
+
+  <!-- Search flyout -->
+  <div class="flyout" id="search-flyout">
+    <div class="srch-input-row" id="srch-input-row">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="text" id="search-input" placeholder="Search for apps, settings, and files" autocomplete="off">
+      <button class="srch-clear" id="srch-clear" title="Clear"><svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div id="search-results"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"><div class="spin"></div><span id="toast-text"></span></div>
+
+  <!-- Right-click context menu -->
+  <div id="ctx-menu">
+    <div class="ctx-item"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="13" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="13" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>View</div>
+    <div class="ctx-item"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h10M4 17h13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Sort by</div>
+    <div class="ctx-item"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4v6h6M20 20v-6h-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 15A8 8 0 0018 18.5M19.5 9A8 8 0 006 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Refresh</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>New</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4S17.8 16.4 19 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Personalize</div>
+    <div class="ctx-item"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Display settings</div>
+  </div>
+
+  <!-- Floating taskbar -->
+  <div id="taskbar-wrap">
+    <div id="taskbar">
+      <div class="tb-group">
+        <button class="tb-btn" id="widgets-btn" title="Widgets">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
+        </button>
+      </div>
+
+      <div class="tb-sep"></div>
+
+      <button class="tb-btn start-btn" id="start-btn" title="Start">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7.5" height="7.5" rx="1.6" fill="url(#g1)"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6" fill="url(#g2)"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6" fill="url(#g2)"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6" fill="url(#g1)"/>
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c9a2ff"/><stop offset="1" stop-color="#7c4dff"/></linearGradient><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e8d6ff"/><stop offset="1" stop-color="#a879ff"/></linearGradient></defs>
+        </svg>
+      </button>
+
+      <div class="tb-search" id="search-btn">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Search</span>
+      </div>
+
+      <div class="tb-group" id="dock-apps">
+        <button class="tb-btn" title="Task View">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="8" height="6" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="4" width="8" height="6" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="8" height="6" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="14" width="8" height="6" rx="1.3" stroke="currentColor" stroke-width="1.6"/></svg>
+        </button>
+        <button class="tb-btn" title="File Explorer" id="tb-explorer-btn">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 7a1 1 0 011-1h4l2 2h10a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V7z" fill="url(#gf)" stroke="none"/><defs><linearGradient id="gf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c9a2ff"/><stop offset="1" stop-color="#7c4dff"/></linearGradient></defs></svg>
+        </button>
+        <button class="tb-btn active-app" title="Microsoft Edge">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="url(#ge)"/><path d="M7 15a6 6 0 0010-4" stroke="#0e0620" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/><defs><radialGradient id="ge" cx="0.3" cy="0.3" r="0.9"><stop stop-color="#7ee8ff"/><stop offset="1" stop-color="#7c4dff"/></radialGradient></defs></svg>
+        </button>
+        <button class="tb-btn" title="Microsoft Store">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 9l1-4h14l1 4M4 9v10a1 1 0 001 1h14a1 1 0 001-1V9M4 9h16" stroke="url(#gs)" stroke-width="1.6" stroke-linejoin="round"/><defs><linearGradient id="gs" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c9a2ff"/><stop offset="1" stop-color="#7c4dff"/></linearGradient></defs></svg>
+        </button>
+        <button class="tb-btn" title="Mail">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 6.5l8 6.5 8-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tb-btn" title="Photos">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="9.5" r="1.7" fill="currentColor"/><path d="M4 17l5-5 4 4 3-3 4 4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tb-btn" title="Settings" id="tb-settings-btn">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v2.4M12 18.6V21M4.2 12H6.6M17.4 12h2.4M6.4 6.4l1.7 1.7M15.9 15.9l1.7 1.7M6.4 17.6l1.7-1.7M15.9 8.1l1.7-1.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="tb-sep"></div>
+
+      <div class="tb-tray" id="tray-btn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 8.5a15 15 0 0118 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M6.5 12a10 10 0 0111 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M10 15.5a5 5 0 014 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="18.5" r="1.1" fill="currentColor"/></svg>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 10v4h4l5 4V6l-5 4H4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M17 9a4 4 0 010 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="8" width="17" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="20" y="10.5" width="2" height="3" rx="0.5" fill="currentColor"/><rect x="4" y="10" width="10" height="4" fill="currentColor"/></svg>
+      </div>
+
+      <div class="tb-clock" id="clock-btn">
+        <div class="time" id="tb-time">10:24 AM</div>
+        <div class="date" id="tb-date">Mon, Aug 10</div>
+      </div>
+
+      <div class="tb-desktop-edge" title="Show desktop"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ---------- Pinned apps + recommended data (reused for start menu) ---------- */
+  const pinnedApps = [
+    {name:'Explorer', cls:'folder', path:'M3 7a1 1 0 011-1h4l2 2h10a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V7z'},
+    {name:'Edge', cls:'edge', circle:true},
+    {name:'Store', cls:'folder2', store:true},
+    {name:'Mail', cls:'mail'},
+    {name:'Photos', cls:'photos'},
+    {name:'Settings', cls:'settings', gear:true},
+    {name:'Calculator', cls:'calc'},
+    {name:'Calendar', cls:'calendar'},
+    {name:'Word', cls:'word'},
+    {name:'Clipchamp', cls:'clip'},
+    {name:'Spotify', cls:'spotify'},
+    {name:'Copilot', cls:'copilot'},
+  ];
+
+  function tileHTML(app){
+    // simple generic rounded tile with a monogram/glyph, gradient by hash
+    const grads = {
+      folder:['#c9a2ff','#7c4dff'], edge:['#7ee8ff','#7c4dff'], folder2:['#ffd08a','#ff8a5b'],
+      mail:['#7ee8ff','#3b82f6'], photos:['#ff8ad4','#7c4dff'], settings:['#a9a9c0','#4a4a5c'],
+      calc:['#8a8a9e','#4a4a5c'], calendar:['#ff6a8a','#c084fc'], word:['#3b8bff','#2557d6'],
+      clip:['#7effc0','#22c55e'], spotify:['#7fff9e','#1db954'], copilot:['#e8d6ff','#a879ff']
+    };
+    const [c1,c2] = grads[app.cls] || ['#a879ff','#7c4dff'];
+    const letter = app.name[0];
+    return `<div class="tile" style="background:linear-gradient(160deg,${c1},${c2}); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:600; color:rgba(0,0,0,0.55); font-size:14px;">${letter}</div>`;
+  }
+
+  const smPinned = document.getElementById('sm-pinned');
+  pinnedApps.forEach(app=>{
+    const el = document.createElement('div');
+    el.className = 'sm-app';
+    el.innerHTML = tileHTML(app) + `<span>${app.name}</span>`;
+    el.addEventListener('click', e=>{ e.stopPropagation(); launchApp(app.name); });
+    smPinned.appendChild(el);
+  });
+
+  const recommended = [
+    {name:'Q3 Roadmap.pptx', sub:'Edited 2h ago', cls:'word'},
+    {name:'Amethyst-wallpaper.png', sub:'Photos · Today', cls:'photos'},
+    {name:'Budget-2026.xlsx', sub:'Edited yesterday', cls:'calc'},
+  ];
+  const smRec = document.getElementById('sm-recommended');
+  recommended.forEach(f=>{
+    const el = document.createElement('div');
+    el.className = 'sm-rec-card';
+    el.innerHTML = tileHTML(f) + `<div><div class="rc-name">${f.name}</div><div class="rc-sub">${f.sub}</div></div>`;
+    el.addEventListener('click', e=>{ e.stopPropagation(); closeAllFlyouts(); openExplorer('documents'); });
+    smRec.appendChild(el);
+  });
+
+  /* ---------- App launcher: routes to a real window, or a toast for concept-only apps ---------- */
+  function launchApp(name){
+    closeAllFlyouts();
+    if(name === 'Explorer'){ openExplorer('documents'); }
+    else if(name === 'Settings'){ openWindow(document.getElementById('settings-window')); }
+    else { showToast('Opening ' + name + '…'); }
+  }
+
+  /* ---------- Toggle helpers ---------- */
+  function closeAllFlyouts(except){
+    ['start-menu','quick-settings','calendar-flyout','widgets-flyout','ctx-menu','search-flyout'].forEach(id=>{
+      if(id!==except) document.getElementById(id).classList.remove('open');
+    });
+  }
+
+  document.getElementById('start-btn').addEventListener('click', e=>{
+    e.stopPropagation();
+    const sm = document.getElementById('start-menu');
+    const willOpen = !sm.classList.contains('open');
+    closeAllFlyouts();
+    if(willOpen) sm.classList.add('open');
+  });
+
+  document.getElementById('tray-btn').addEventListener('click', e=>{
+    e.stopPropagation();
+    const qs = document.getElementById('quick-settings');
+    const willOpen = !qs.classList.contains('open');
+    closeAllFlyouts();
+    if(willOpen) qs.classList.add('open');
+  });
+
+  document.getElementById('clock-btn').addEventListener('click', e=>{
+    e.stopPropagation();
+    const cal = document.getElementById('calendar-flyout');
+    const willOpen = !cal.classList.contains('open');
+    closeAllFlyouts();
+    if(willOpen) cal.classList.add('open');
+  });
+
+  document.getElementById('widgets-btn').addEventListener('click', e=>{
+    e.stopPropagation();
+    const wg = document.getElementById('widgets-flyout');
+    const willOpen = !wg.classList.contains('open');
+    closeAllFlyouts();
+    if(willOpen) wg.classList.add('open');
+  });
+
+  document.getElementById('tb-settings-btn').addEventListener('click', e=>{
+    e.stopPropagation();
+    bounceIcon(e.currentTarget);
+    closeAllFlyouts();
+    openWindow(document.getElementById('settings-window'));
+  });
+
+  document.getElementById('tb-explorer-btn').addEventListener('click', e=>{
+    e.stopPropagation();
+    bounceIcon(e.currentTarget);
+    closeAllFlyouts();
+    openExplorer(explorerLastSection || 'documents');
+  });
+
+  document.querySelectorAll('.qs-tile').forEach(t=>{
+    t.addEventListener('click', ()=> t.classList.toggle('on'));
+  });
+
+  document.addEventListener('click', ()=> closeAllFlyouts());
+
+  /* ---------- Toast ---------- */
+  let toastTimer = null;
+  function showToast(text){
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-text').textContent = text;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> toast.classList.remove('show'), 1800);
+  }
+
+  /* ---------- Icon bounce on launch ---------- */
+  function bounceIcon(btn){
+    btn.classList.remove('bounce');
+    void btn.offsetWidth;
+    btn.classList.add('bounce');
+  }
+
+  /* ---------- Generic window manager: open/close/minimize/maximize + z-index focus ---------- */
+  let zTop = 5;
+  function bringToFront(win){
+    zTop += 1;
+    win.style.zIndex = zTop;
+  }
+  function openWindow(win){
+    closeAllFlyouts();
+    win.style.display = 'flex';
+    win.classList.remove('closing','minimizing');
+    void win.offsetWidth;
+    win.classList.add('opening');
+    bringToFront(win);
+    setActiveDockIcon(win.id, true);
+    win.addEventListener('animationend', function h(){ win.classList.remove('opening'); win.removeEventListener('animationend', h); }, {once:true});
+  }
+  function closeWindow(win){
+    win.classList.add('closing');
+    setActiveDockIcon(win.id, false);
+    win.addEventListener('animationend', function h(){
+      win.style.display = 'none';
+      win.classList.remove('closing');
+      win.removeEventListener('animationend', h);
+    }, {once:true});
+  }
+  function minimizeWindow(win){
+    win.classList.add('minimizing');
+    setActiveDockIcon(win.id, false);
+    win.addEventListener('animationend', function h(){
+      win.style.display = 'none';
+      win.classList.remove('minimizing');
+      win.removeEventListener('animationend', h);
+    }, {once:true});
+  }
+  function toggleMaximize(win){
+    win.classList.add('resizing');
+    if(win.classList.contains('maximized')){
+      win.classList.remove('maximized');
+      if(win.dataset.prevTop !== undefined){
+        win.style.top = win.dataset.prevTop;
+        win.style.left = win.dataset.prevLeft;
+        win.style.width = win.dataset.prevWidth;
+        win.style.height = win.dataset.prevHeight;
+      }
+    } else {
+      win.dataset.prevTop = win.style.top;
+      win.dataset.prevLeft = win.style.left;
+      win.dataset.prevWidth = win.style.width;
+      win.dataset.prevHeight = win.style.height;
+      win.classList.add('maximized');
+    }
+    setTimeout(()=> win.classList.remove('resizing'), 240);
+  }
+  function setActiveDockIcon(winId, active){
+    const map = { 'settings-window':'tb-settings-btn', 'explorer-window':'tb-explorer-btn' };
+    const btn = document.getElementById(map[winId]);
+    if(btn) btn.classList.toggle('active-app', active);
+  }
+
+  document.querySelectorAll('.window').forEach(win=>{
+    win.addEventListener('mousedown', ()=> bringToFront(win));
+    win.querySelectorAll('[data-win-action]').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        e.stopPropagation();
+        const action = btn.dataset.winAction;
+        if(action === 'close') closeWindow(win);
+        else if(action === 'minimize') minimizeWindow(win);
+        else if(action === 'maximize') toggleMaximize(win);
+      });
+    });
+    const bar = win.querySelector('.win-titlebar');
+    if(bar){
+      bar.addEventListener('dblclick', e=>{
+        if(e.target.closest('.win-controls')) return;
+        toggleMaximize(win);
+      });
+    }
+  });
+
+  /* ---------- Window controls ---------- */
+  document.querySelectorAll('.swatch').forEach(sw=>{
+    sw.addEventListener('click', e=>{
+      e.stopPropagation();
+      document.querySelectorAll('.swatch').forEach(s=>{ s.classList.remove('active'); s.innerHTML=''; });
+      sw.classList.add('active');
+      sw.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    });
+  });
+  document.querySelectorAll('.switch').forEach(sw=>{
+    sw.addEventListener('click', e=>{ e.stopPropagation(); sw.classList.toggle('on'); });
+  });
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    n.addEventListener('click', e=>{
+      e.stopPropagation();
+      document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+      n.classList.add('active');
+    });
+  });
+
+  /* ---------- Make every window draggable by its titlebar ---------- */
+  function makeDraggable(win){
+    const bar = win.querySelector('.win-titlebar');
+    let dragging=false, ox=0, oy=0;
+    bar.addEventListener('mousedown', e=>{
+      if(e.target.closest('.win-controls')) return;
+      if(win.classList.contains('maximized')) return;
+      dragging = true;
+      const r = win.getBoundingClientRect();
+      ox = e.clientX - r.left; oy = e.clientY - r.top;
+    });
+    document.addEventListener('mousemove', e=>{
+      if(!dragging) return;
+      win.style.left = (e.clientX - ox) + 'px';
+      win.style.top = Math.max(4, e.clientY - oy) + 'px';
+    });
+    document.addEventListener('mouseup', ()=> dragging=false);
+  }
+  document.querySelectorAll('.window').forEach(makeDraggable);
+
+  /* ---------- File Explorer content ---------- */
+  const feData = {
+    desktop: { label:'Desktop', items:[
+      {name:'This PC', cls:'pc', sub:'Shortcut'},
+      {name:'Recycle Bin', cls:'recycle', sub:'Shortcut'},
+      {name:'Amethyst-wallpaper.png', cls:'photos', sub:'2.1 MB'},
+    ]},
+    documents: { label:'Documents', items:[
+      {name:'Q3 Roadmap.pptx', cls:'word', sub:'Edited 2h ago'},
+      {name:'Budget-2026.xlsx', cls:'calc', sub:'Edited yesterday'},
+      {name:'Design Notes.docx', cls:'word', sub:'Edited 3d ago'},
+      {name:'Client Contracts', cls:'folder', sub:'Folder', folder:true},
+      {name:'Meeting Minutes.docx', cls:'word', sub:'Edited last week'},
+      {name:'Old Resumes', cls:'folder', sub:'Folder', folder:true},
+    ]},
+    downloads: { label:'Downloads', items:[
+      {name:'windows12-concept.zip', cls:'folder2', sub:'14.6 MB'},
+      {name:'setup-installer.exe', cls:'calc', sub:'38.2 MB'},
+      {name:'wallpaper-pack', cls:'folder', sub:'Folder', folder:true},
+      {name:'invoice-aug.pdf', cls:'word', sub:'220 KB'},
+    ]},
+    pictures: { label:'Pictures', items:[
+      {name:'Screenshots', cls:'folder', sub:'Folder', folder:true},
+      {name:'Amethyst-wallpaper.png', cls:'photos', sub:'2.1 MB'},
+      {name:'Camera Roll', cls:'folder', sub:'Folder', folder:true},
+      {name:'holiday-2026.jpg', cls:'photos', sub:'4.8 MB'},
+    ]},
+    music: { label:'Music', items:[
+      {name:'Playlists', cls:'folder', sub:'Folder', folder:true},
+      {name:'favorite-track.mp3', cls:'spotify', sub:'6.4 MB'},
+    ]},
+    localdisk: { label:'Local Disk (C:)', items:[
+      {name:'Users', cls:'folder', sub:'Folder', folder:true},
+      {name:'Program Files', cls:'folder', sub:'Folder', folder:true},
+      {name:'Windows', cls:'folder', sub:'Folder', folder:true},
+      {name:'Program Files (x86)', cls:'folder', sub:'Folder', folder:true},
+    ]},
+    recyclebin: { label:'Recycle Bin', items:[] },
+  };
+
+  function feTileHTML(item){
+    if(item.folder) return `<div class="tile folder" style="width:38px;height:38px;border-radius:9px;"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7a1 1 0 011-1h4l2 2h8a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V7z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg></div>`;
+    return tileHTML(item);
+  }
+
+  function renderExplorer(section){
+    explorerLastSection = section;
+    const data = feData[section] || feData.documents;
+    document.getElementById('fe-title-label').textContent = data.label;
+    document.getElementById('fe-crumb-label').textContent = data.label;
+    document.getElementById('fe-section-heading').textContent = data.label;
+    document.querySelectorAll('.fe-nav-item').forEach(n=> n.classList.toggle('active', n.dataset.fe === section));
+    const grid = document.getElementById('fe-grid');
+    grid.innerHTML = '';
+    if(!data.items.length){
+      grid.innerHTML = `<div class="fe-empty" style="grid-column:1/-1;">It's empty in here — nothing to see.</div>`;
+      return;
+    }
+    data.items.forEach(item=>{
+      const el = document.createElement('div');
+      el.className = 'fe-item';
+      el.innerHTML = feTileHTML(item) + `<span>${item.name}</span><div class="fe-sub">${item.sub}</div>`;
+      el.addEventListener('click', e=>{
+        e.stopPropagation();
+        document.querySelectorAll('.fe-item').forEach(o=>o.classList.remove('selected'));
+        el.classList.add('selected');
+      });
+      el.addEventListener('dblclick', e=>{
+        e.stopPropagation();
+        if(item.folder){ showToast('Opening ' + item.name + '…'); }
+        else { showToast('Opening ' + item.name + '…'); }
+      });
+      grid.appendChild(el);
+    });
+  }
+  let explorerLastSection = 'documents';
+  function openExplorer(section){
+    openWindow(document.getElementById('explorer-window'));
+    renderExplorer(section || 'documents');
+  }
+  document.querySelectorAll('.fe-nav-item').forEach(n=>{
+    n.addEventListener('click', e=>{
+      e.stopPropagation();
+      renderExplorer(n.dataset.fe);
+    });
+  });
+  document.getElementById('fe-search-input').addEventListener('input', e=>{
+    const q = e.target.value.trim().toLowerCase();
+    const data = feData[explorerLastSection] || feData.documents;
+    const grid = document.getElementById('fe-grid');
+    const items = q ? data.items.filter(i=> i.name.toLowerCase().includes(q)) : data.items;
+    grid.innerHTML = '';
+    if(!items.length){
+      grid.innerHTML = `<div class="fe-empty" style="grid-column:1/-1;">No results for "${e.target.value}"</div>`;
+      return;
+    }
+    items.forEach(item=>{
+      const el = document.createElement('div');
+      el.className = 'fe-item';
+      el.innerHTML = feTileHTML(item) + `<span>${item.name}</span><div class="fe-sub">${item.sub}</div>`;
+      grid.appendChild(el);
+    });
+  });
+  document.getElementById('fe-search-input').addEventListener('click', e=> e.stopPropagation());
+  document.querySelector('.fe-toolbar').addEventListener('mousedown', e=> e.stopPropagation());
+  renderExplorer('documents');
+
+  /* ---------- Desktop icon double-click launches apps ---------- */
+  document.querySelectorAll('.d-icon[data-open]').forEach(ic=>{
+    ic.addEventListener('dblclick', e=>{
+      e.stopPropagation();
+      const kind = ic.dataset.open;
+      if(kind === 'explorer') openExplorer(ic.dataset.feSection || 'documents');
+      else if(kind === 'settings') openWindow(document.getElementById('settings-window'));
+      else if(kind === 'toast') showToast('Opening ' + (ic.dataset.toastLabel || 'app') + '…');
+    });
+  });
+
+  /* ---------- Search: global search flyout ---------- */
+  const settingsPages = [
+    {name:'Colors', sub:'Personalization', cls:'settings'},
+    {name:'System', sub:'Settings', cls:'settings'},
+    {name:'Bluetooth & devices', sub:'Settings', cls:'settings'},
+    {name:'Network & internet', sub:'Settings', cls:'settings'},
+    {name:'Personalization', sub:'Settings', cls:'settings'},
+    {name:'Apps', sub:'Settings', cls:'settings'},
+    {name:'Time & language', sub:'Settings', cls:'settings'},
+    {name:'Windows Update', sub:'Settings', cls:'settings'},
+  ];
+  const fileSearchIndex = [];
+  Object.keys(feData).forEach(section=>{
+    feData[section].items.forEach(item=> fileSearchIndex.push({...item, section}));
+  });
+
+  function renderSearchResults(query){
+    const box = document.getElementById('search-results');
+    const q = query.trim().toLowerCase();
+    box.innerHTML = '';
+    if(!q){
+      box.innerHTML = `<div class="srch-section-label">Pinned apps</div>`;
+      const wrap = document.createElement('div');
+      pinnedApps.slice(0,6).forEach(app=> wrap.appendChild(buildSearchRow(app.name, 'App', app)));
+      box.appendChild(wrap);
+      return;
+    }
+    const appMatches = pinnedApps.filter(a=> a.name.toLowerCase().includes(q));
+    const settingMatches = settingsPages.filter(s=> s.name.toLowerCase().includes(q));
+    const fileMatches = fileSearchIndex.filter(f=> f.name.toLowerCase().includes(q));
+
+    if(!appMatches.length && !settingMatches.length && !fileMatches.length){
+      box.innerHTML = `<div class="srch-empty">No results for "${query}"</div>`;
+      return;
+    }
+    if(appMatches.length){
+      box.innerHTML += `<div class="srch-section-label">Apps</div>`;
+      appMatches.forEach(app=> box.appendChild(buildSearchRow(app.name, 'App', app, ()=> launchApp(app.name))));
+    }
+    if(settingMatches.length){
+      box.innerHTML += `<div class="srch-section-label">Settings</div>`;
+      settingMatches.forEach(s=> box.appendChild(buildSearchRow(s.name, s.sub, s, ()=>{ closeAllFlyouts(); openWindow(document.getElementById('settings-window')); })));
+    }
+    if(fileMatches.length){
+      box.innerHTML += `<div class="srch-section-label">Documents &amp; files</div>`;
+      fileMatches.forEach(f=> box.appendChild(buildSearchRow(f.name, feData[f.section].label, f, ()=>{ closeAllFlyouts(); openExplorer(f.section); })));
+    }
+  }
+  function buildSearchRow(name, sub, tileSource, onClick){
+    const row = document.createElement('div');
+    row.className = 'srch-row';
+    row.innerHTML = tileHTML(tileSource) + `<div><div class="srch-name">${name}</div><div class="srch-sub">${sub}</div></div>`;
+    row.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(onClick) onClick(); else { closeAllFlyouts(); showToast('Opening ' + name + '…'); }
+    });
+    return row;
+  }
+  function openSearchFlyout(){
+    closeAllFlyouts('search-flyout');
+    document.getElementById('search-flyout').classList.add('open');
+    renderSearchResults('');
+    const input = document.getElementById('search-input');
+    input.value = '';
+    document.getElementById('srch-input-row').classList.remove('has-text');
+    setTimeout(()=> input.focus(), 60);
+  }
+  document.getElementById('search-btn').addEventListener('click', e=>{
+    e.stopPropagation();
+    openSearchFlyout();
+  });
+  document.querySelector('.sm-search').addEventListener('click', e=>{
+    e.stopPropagation();
+    document.getElementById('start-menu').classList.remove('open');
+    openSearchFlyout();
+  });
+  document.getElementById('search-input').addEventListener('input', e=>{
+    document.getElementById('srch-input-row').classList.toggle('has-text', e.target.value.length>0);
+    renderSearchResults(e.target.value);
+  });
+  document.getElementById('search-input').addEventListener('click', e=> e.stopPropagation());
+  document.getElementById('srch-clear').addEventListener('click', e=>{
+    e.stopPropagation();
+    const input = document.getElementById('search-input');
+    input.value = '';
+    document.getElementById('srch-input-row').classList.remove('has-text');
+    renderSearchResults('');
+    input.focus();
+  });
+  document.getElementById('search-input').addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){
+      const first = document.querySelector('#search-results .srch-row');
+      if(first) first.click();
+    } else if(e.key === 'Escape'){
+      closeAllFlyouts();
+    }
+  });
+
+  /* ---------- Context menu ---------- */
+  const ctx = document.getElementById('ctx-menu');
+  document.getElementById('desktop').addEventListener('contextmenu', e=>{
+    e.preventDefault();
+    closeAllFlyouts();
+    const menuW = 240, menuH = 250;
+    let x = e.clientX, y = e.clientY;
+    if(x + menuW > window.innerWidth) x = window.innerWidth - menuW - 8;
+    if(y + menuH > window.innerHeight) y = window.innerHeight - menuH - 8;
+    ctx.style.left = x+'px';
+    ctx.style.top = y+'px';
+    ctx.classList.add('open');
+  });
+  ctx.addEventListener('click', e=> e.stopPropagation());
+
+  /* stop propagation for interactive floating panels so outside-click logic doesn't fire */
+  ['start-menu','quick-settings','calendar-flyout','widgets-flyout'].forEach(id=>{
+    document.getElementById(id).addEventListener('click', e=> e.stopPropagation());
+  });
+  document.querySelectorAll('.window').forEach(win=> win.addEventListener('mousedown', e=> e.stopPropagation()));
+
+  /* ---------- Dock magnification (mac-style) on taskbar app icons ---------- */
+  const dock = document.getElementById('dock-apps');
+  const dockBtns = Array.from(dock.querySelectorAll('.tb-btn'));
+  dock.addEventListener('mousemove', e=>{
+    const rect = dock.getBoundingClientRect();
+    const mx = e.clientX;
+    dockBtns.forEach(btn=>{
+      const br = btn.getBoundingClientRect();
+      const center = br.left + br.width/2;
+      const dist = Math.abs(mx - center);
+      const scale = Math.max(1, 1.35 - dist/140);
+      const lift = Math.max(0, (scale-1))*14;
+      btn.style.transform = `translateY(-${lift}px) scale(${scale})`;
+    });
+  });
+  dock.addEventListener('mouseleave', ()=>{
+    dockBtns.forEach(btn=> btn.style.transform = '');
+  });
+
+  /* ---------- Live clock ---------- */
+  function pad(n){ return n<10 ? '0'+n : n; }
+  function updateClock(){
+    const now = new Date();
+    let h = now.getHours();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12; if(h===0) h = 12;
+    document.getElementById('tb-time').textContent = `${h}:${pad(now.getMinutes())} ${ampm}`;
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('tb-date').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000*20);
+
+  /* ---------- Calendar flyout content ---------- */
+  (function(){
+    const now = new Date();
+    const year = now.getFullYear(), month = now.getMonth();
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('cal-month-label').textContent = `${months[month]} ${year}`;
+    const grid = document.getElementById('cal-grid');
+    ['S','M','T','W','T','F','S'].forEach(d=>{
+      const el = document.createElement('div');
+      el.className='dow'; el.textContent=d; grid.appendChild(el);
+    });
+    const first = new Date(year, month, 1);
+    const startOffset = first.getDay();
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const daysInPrev = new Date(year, month, 0).getDate();
+    for(let i=0;i<startOffset;i++){
+      const el = document.createElement('div');
+      el.className='day muted'; el.textContent = daysInPrev - startOffset + 1 + i;
+      grid.appendChild(el);
+    }
+    for(let d=1; d<=daysInMonth; d++){
+      const el = document.createElement('div');
+      el.className='day' + (d===now.getDate() ? ' today':'');
+      el.textContent = d;
+      grid.appendChild(el);
+    }
+    const remaining = (7 - (grid.children.length % 7)) % 7;
+    for(let i=1;i<=remaining;i++){
+      const el = document.createElement('div');
+      el.className='day muted'; el.textContent = i;
+      grid.appendChild(el);
+    }
+  })();
+
+  /* ---------- Desktop icon selection ---------- */
+  document.querySelectorAll('.d-icon').forEach(ic=>{
+    ic.addEventListener('click', e=>{
+      e.stopPropagation();
+      document.querySelectorAll('.d-icon').forEach(o=>o.classList.remove('selected'));
+      ic.classList.add('selected');
+    });
+  });
+  document.getElementById('desktop').addEventListener('click', ()=>{
+    document.querySelectorAll('.d-icon').forEach(o=>o.classList.remove('selected'));
+  });
+
+  /* ---------- Initial state ---------- */
+ // setActiveDockIcon('settings-window', true);
+ // bringToFront(document.getElementById('settings-window'));
+</script>
+</body>
+</html>
